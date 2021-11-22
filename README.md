@@ -14,7 +14,7 @@
 2. Log into your server and create a `honeyup` user with a home directory.
 3. Upload/copy the contents of this repo to your honeyup user's home `/home/honeyup`.
 4. Copy the `honeyup` binary from `target/release/` to `/home/honeyup`.
-5. Edit `res/config.env.txt to make it believable (add some canary tokens too).
+5. Edit `res/config.env.txt` to make it believable (add some canary tokens too).
 6. Upload/copy the systemd service descriptor from `conf/honeyup.service` to `/etc/systemd/system/honeyup.service`.
 7. Reload all systemd service descriptors `systemctl daemon-reload`.
 8. Ensure any currently served sites do not use the `/uploads` path.
