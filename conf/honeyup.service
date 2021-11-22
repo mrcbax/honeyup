@@ -1,0 +1,12 @@
+[Unit]
+Description="The DosLab website upload honeypot daemon"
+
+[Service]
+Type=simple
+User=honeyup
+ExecStart=/home/honeyup/honeyup
+Restart=on-failure
+WorkingDirectory=/home/honeyup
+
+[Install]
+WantedBy=multi-user.target
