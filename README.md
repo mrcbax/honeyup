@@ -22,3 +22,7 @@
 10. Reload the NGiNX config with `systemctl reload nginx`.
 11. Enable and start the `honeyup` service `systemctl enable honeyup` & `systemctl start honeyup`.
 12. Browse to `/uploads` on your website and use `upload.php` to upload some dummy/bait files. 
+
+### Notes
+
+Be sure to check up on the `uploaded_files` folder often to be sure you aren't hosting somebody's malware.
