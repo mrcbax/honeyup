@@ -1,5 +1,5 @@
 [Unit]
-Description="The DosLab website upload honeypot daemon"
+Description="The honeyup upload honeypot daemon"
 
 [Service]
 Type=simple
