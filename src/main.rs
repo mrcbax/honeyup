@@ -54,8 +54,10 @@ async fn main() {
             buffer.push_str(FILES_INDEX_FOOTER);
             return warp::reply::with_header(buffer, "Content-Type", "text/html").into_response();
         }
-        if reply.as_str().contains("php") {
+        if reply.as_str().contains("php") || reply.as_str().contains("php5") || reply.as_str().contains("php6") || reply.as_str().contains("php7") || reply.as_str().contains("php8") {
             return warp::reply::html("PHP Engine not enabled.").into_response();
+        } else if reply.as_str().contains("phtml") || reply.as_str().contains("html") || reply.as_str().contains("htm") || reply.as_str().contains("html5") {
+            return warp::reply::html("Page not available").into_response();
         } else {
             let mut buffer = Vec::new();
             let reply_name = clean(reply.as_str());
