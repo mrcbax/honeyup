@@ -1,0 +1,59 @@
+## Build Stage
+# Pull base image and update
+FROM rust:latest AS builder
+
+RUN update-ca-certificates
+
+
+# Create app user
+ARG USER=honeyup
+ARG UID=10001
+
+ENV USER=$USER
+ENV UID=$UID
+
+RUN adduser \
+    --disabled-password \
+    --gecos "" \
+    --home "/nonexistent" \
+    --shell "/sbin/nologin" \
+    --no-create-home \
+    --uid "${UID}" \
+    "${USER}"
+
+# Install git and clone repo
+RUN apt-get update && apt-get install -y git
+RUN git clone https://github.com/LogoiLab/honeyup.git /app
+
+# Move to repo
+WORKDIR /app
+
+# Build app
+RUN cargo build --release
+
+####################################################################################################
+## Final image
+####################################################################################################
+FROM debian:buster-slim
+
+# Import from builder.
+COPY --from=builder /etc/passwd /etc/passwd
+COPY --from=builder /etc/group /etc/group
+
+WORKDIR /app
+# RUN chown +775 ../app
+# RUN chmod $USER:$USER ../app
+
+# Copy our build
+COPY --from=builder /app/target/release/honeyup ./
+COPY --from=builder /app/conf ./conf
+COPY --from=builder /app/res ./res
+COPY --from=builder /app/uploaded_files ./uploaded_files
+
+# Use an unprivileged user.
+USER $USER:$USER
+
+# Expose web http port
+EXPOSE 4000
+
+CMD ["/app/honeyup"]

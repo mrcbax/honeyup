@@ -26,3 +26,5 @@
 ### Notes
 
 Be sure to check up on the `uploaded_files` folder often to be sure you aren't hosting somebody's malware.
+
+Also if you are using Docker, please be sure to change `/path/to/uploaded_files` in the docker-compose.yml before building.
