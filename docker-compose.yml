@@ -9,5 +9,5 @@ services:
     ports:
       - '4000:4000'
     volumes:
-      - /path/to/uploaded_files:/app/uploaded_files:775
+      - /path/to/uploaded_files:/app/uploaded_files:rw
     restart: unless-stopped
