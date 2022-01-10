@@ -26,3 +26,14 @@
 ### Notes
 
 Be sure to check up on the `uploaded_files` folder often to be sure you aren't hosting somebody's malware.
+
+### Docker Installation
+
+You will need Docker and docker-compose for this
+
+1. Clone the repository `git clone https://github.com/LogoiLab/honeyup.git`
+2. The docker-compose.yml file has a couple of environment variables you will want to set. The `APP_ID`, `AWS_ACCESS_KEY_ID`, and `AWS_SECRET_ACCESS_KEY` will be set with a service like [Canary Tokens](https://canarytokens.org/generate). The `SMTP`, `ADDRESS`, and `PASSWORD` variables are used to make your honeyup look more reputable as a vulnerable server. Finally, please set the `/path/to/uploaded_files` as a location outside the container where you would like the uploaded files to be stored
+3. Run `docker-compose up -d` in the honeyup directory
+4. Done!
+
+The container will listen on port 4000 unless specified otherwise.
