@@ -23,7 +23,7 @@ RUN adduser \
 
 # Install git and clone repo
 RUN apt-get update && apt-get install -y git
-RUN git clone https://github.com/StappsWorld/honeyup.git /app
+RUN git clone https://github.com/LogoiLab/honeyup.git /app
 
 # Move to repo
 WORKDIR /app
