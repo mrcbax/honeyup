@@ -11,3 +11,10 @@ services:
     volumes:
       - /path/to/uploaded_files:/app/uploaded_files:rw
     restart: unless-stopped
+    environment:
+      APP_ID: "set_app_id"
+      AWS_ACCESS_KEY_ID: "aws_access_key_id"
+      AWS_SECRET_ACCESS_KEY: "aws_secret_access_key"
+      SMTP: "smtp.example.com"
+      ADDRESS: "noreply@example.com"
+      PASSWORD: "set_password"

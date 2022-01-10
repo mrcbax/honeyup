@@ -41,10 +41,9 @@ COPY --from=builder /etc/passwd /etc/passwd
 COPY --from=builder /etc/group /etc/group
 
 WORKDIR /app
-# RUN chown +775 ../app
-# RUN chmod $USER:$USER ../app
 
 # Copy our build
+COPY --from=builder /app/entrypoint.sh ./
 COPY --from=builder /app/target/release/honeyup ./
 COPY --from=builder /app/conf ./conf
 COPY --from=builder /app/res ./res
@@ -56,4 +55,4 @@ USER $USER:$USER
 # Expose web http port
 EXPOSE 4000
 
-CMD ["/app/honeyup"]
+ENTRYPOINT ["/app/entrypoint.sh"]
