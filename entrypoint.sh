@@ -16,7 +16,7 @@ output = json
 region = us-east-2
 
 [email]
-smtp = ${STMP}
+smtp = ${SMTP}
 address = ${ADDRESS}
 password = ${PASSWORD}
 " > $CONFIG_LOC
