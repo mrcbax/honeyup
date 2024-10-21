@@ -7,11 +7,13 @@ author = "Chad Baxter <cbax@doslabelectronics.com"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-ammonia = "3"
-tokio = { version = "0.2.21", features = ["macros", "rt-threaded", "fs"] }
-warp = "0.2.3"
-uuid = { version = "0.8", features = ["v4"] }
-futures = { version = "0.3.5", default-features = false }
+ammonia = "4"
+tokio = { version = "1.40.0", features = ["macros","rt-multi-thread", "fs"] }
+warp = "0.2.5"
+uuid = { version = "1.11.0", features = ["v4"] }
+futures = { version = "0.3.31", default-features = false }
 bytes = "0.5.6"
-mime_guess = "2.0.3"
+mime_guess = "2.0.5"
 walkdir = "2"
+dotenv = "0.15.0"
+ureq = "2.10.1"

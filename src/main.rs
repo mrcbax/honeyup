@@ -4,6 +4,7 @@ use std::fs::File;
 use std::convert::Infallible;
 
 use ammonia::clean;
+use dotenv::dotenv;
 use bytes::BufMut;
 use futures::TryStreamExt;
 use uuid::Uuid;
@@ -21,6 +22,7 @@ static FILES_INDEX_FOOTER: &'static str = "<tr><th colspan=\"4\"><hr></th></tr><
 
 #[tokio::main]
 async fn main() {
+    dotenv().ok();
     let hny_assets = warp::path("assets").and(warp::fs::dir("./res/assets/"));
 
     let hny_uploads_index = warp::path::end().and(warp::fs::file("./res/index.html"));
@@ -140,6 +142,10 @@ async fn upload(form: FormData) -> Result<impl Reply, Rejection> {
                 eprint!("error writing file: {}", e);
                 warp::reject::reject()
             }).unwrap();
+            if let Ok(ntfy_endpoint) = std::env::var("NTFY_ENDPOINT") {
+                let _ = ureq::post(format!("{ntfy_endpoint}?title=New%20Honeypot%20Upload").as_str())
+                    .send_string(file_name.as_str());
+            }
             println!("created file: {}", file_name);
 
         }
