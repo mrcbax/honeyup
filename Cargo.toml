@@ -8,7 +8,7 @@ author = "Chad Baxter <cbax@doslabelectronics.com"
 
 [dependencies]
 ammonia = "4"
-tokio = { version = "1.40.0", features = ["macros","rt-multi-thread", "fs"] }
+tokio = { version = "0.2", features = ["macros","rt-threaded", "fs"] }
 warp = "0.2.5"
 uuid = { version = "1.11.0", features = ["v4"] }
 futures = { version = "0.3.31", default-features = false }

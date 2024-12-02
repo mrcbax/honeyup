@@ -1,15 +1,15 @@
-use std::io::Read;
-use std::io::BufReader;
-use std::fs::File;
 use std::convert::Infallible;
+use std::fs::File;
+use std::io::BufReader;
+use std::io::Read;
 
 use ammonia::clean;
-use dotenv::dotenv;
 use bytes::BufMut;
+use dotenv::dotenv;
 use futures::TryStreamExt;
 use uuid::Uuid;
 use warp::{
-    http::StatusCode,
+    http::{StatusCode, Uri},
     multipart::{FormData, Part},
     Filter, Rejection, Reply,
 };
@@ -18,7 +18,8 @@ use walkdir::WalkDir;
 
 static FILES_INDEX_HEAD: &'static str = "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 3.2 Final//EN\"><html><head><meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\"><title>Index of /files</title></head><body><h1>Index of /files</h1><table><tbody><tr><th valign=\"top\"><img src=\"./assets/blank.gif\" alt=\"[ICO]\"></th><th>Name</th><th>Size</th><th>Description</a></th></tr><tr><th colspan=\"4\"><hr></th></tr><tr><td valign=\"top\"><img src=\"./assets/back.gif\" alt=\"[PARENTDIR]\"></td><td><a href=\"./\">Parent Directory</a> </td><td align=\"right\"> - </td><td>&nbsp;</td></tr>";
 
-static FILES_INDEX_FOOTER: &'static str = "<tr><th colspan=\"4\"><hr></th></tr></tbody></table></body></html>";
+static FILES_INDEX_FOOTER: &'static str =
+    "<tr><th colspan=\"4\"><hr></th></tr></tbody></table></body></html>";
 
 #[tokio::main]
 async fn main() {
@@ -60,7 +61,9 @@ async fn main() {
             return warp::reply::html("PHP Engine not enabled.").into_response();
         } else if reply.as_str().contains("phtml") || reply.as_str().contains("html") || reply.as_str().contains("htm") || reply.as_str().contains("html5") {
             return warp::reply::html("Page not available").into_response();
-        } else {
+        } else if reply.as_str().contains("mp4") || reply.as_str().contains("avi") || reply.as_str().contains("mov") || reply.as_str().contains("mkv") || reply.as_str().contains("webm") {
+            return warp::redirect::redirect(Uri::from_static("https://www.youtube.com/watch?v=dQw4w9WgXcQ")).into_response();
+        }else {
             let mut buffer = Vec::new();
             let reply_name = clean(reply.as_str());
             let path = format!("./uploaded_files/{}.disabled", reply_name);
@@ -117,37 +120,59 @@ async fn handle_rejection(err: Rejection) -> std::result::Result<impl Reply, Inf
 }
 
 async fn upload(form: FormData) -> Result<impl Reply, Rejection> {
-    let parts: Vec<Part> = form.try_collect().await.map_err(|e| {
-        eprintln!("form error: {}", e);
-        warp::reject::reject()
-    }).unwrap();
+    let parts: Vec<Part> = form
+        .try_collect()
+        .await
+        .map_err(|e| {
+            eprintln!("form error: {}", e);
+            warp::reject::reject()
+        })
+        .unwrap();
     let mut return_val = String::from("success: ");
     for p in parts {
         if p.name() == "fileToUpload" {
-
             let file_ending = clean(p.filename().unwrap_or(""));
 
-            let value = p.stream().try_fold(Vec::new(), |mut vec, data| {
-                vec.put(data);
-                async move { Ok(vec) }
-            }).await.map_err(|e| {
-                eprintln!("reading file error: {}", e);
-                warp::reject::reject()
-            }).unwrap();
+            let value = p
+                .stream()
+                .try_fold(Vec::new(), |mut vec, data| {
+                    vec.put(data);
+                    async move { Ok(vec) }
+                })
+                .await
+                .map_err(|e| {
+                    eprintln!("reading file error: {}", e);
+                    warp::reject::reject()
+                })
+                .unwrap();
 
             let file_uuid = Uuid::new_v4().to_string();
-            let file_name = format!("./uploaded_files/{}-{}.disabled", file_uuid, file_ending);
-            return_val.push_str(format!("D:\\xampp\\www\\uploads\\files\\{}-{}\n", file_uuid, file_ending).as_str());
-            tokio::fs::write(&file_name, value).await.map_err(|e| {
-                eprint!("error writing file: {}", e);
-                warp::reject::reject()
-            }).unwrap();
+            let mut file_name = String::new();
+            if file_ending.len() > 0 {
+                file_name = format!("./uploaded_files/{}-{}.disabled", file_uuid, file_ending);
+            } else {
+                warp::reject::reject();
+            }
+            return_val.push_str(
+                format!(
+                    "D:\\xampp\\www\\uploads\\files\\{}-{}\n",
+                    file_uuid, file_ending
+                )
+                .as_str(),
+            );
+            tokio::fs::write(&file_name, value)
+                .await
+                .map_err(|e| {
+                    eprint!("error writing file: {}", e);
+                    warp::reject::reject()
+                })
+                .unwrap();
             if let Ok(ntfy_endpoint) = std::env::var("NTFY_ENDPOINT") {
-                let _ = ureq::post(format!("{ntfy_endpoint}?title=New%20Honeypot%20Upload").as_str())
-                    .send_string(file_name.as_str());
+                let _ =
+                    ureq::post(format!("{ntfy_endpoint}?title=New%20Honeypot%20Upload").as_str())
+                        .send_string(file_name.as_str());
             }
             println!("created file: {}", file_name);
-
         }
     }
     Ok(return_val)
