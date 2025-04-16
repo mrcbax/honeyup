@@ -63,7 +63,18 @@ async fn main() {
             return warp::reply::html("Page not available").into_response();
         } else if reply.as_str().contains("mp4") || reply.as_str().contains("avi") || reply.as_str().contains("mov") || reply.as_str().contains("mkv") || reply.as_str().contains("webm") {
             return warp::redirect::redirect(Uri::from_static("https://www.youtube.com/watch?v=dQw4w9WgXcQ")).into_response();
-        }else {
+        } else if reply.as_str().to_lowercase().contains("exe") {
+            let mut buffer = Vec::new();
+            let reply_name = clean(reply.as_str());
+            match File::open("./res/calc.exe") {
+                Ok(f) => {
+                    let mut reader = BufReader::new(f);
+                    reader.read_to_end(&mut buffer).unwrap();
+                },
+                Err(e) => eprintln!("Failed to access file: {}", e)
+            }
+            return warp::reply::with_header(buffer, "Content-Type", mime_guess::from_path(reply_name).first_or_text_plain().essence_str()).into_response();
+        } else {
             let mut buffer = Vec::new();
             let reply_name = clean(reply.as_str());
             let path = format!("./uploaded_files/{}.disabled", reply_name);
