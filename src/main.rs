@@ -66,26 +66,34 @@ async fn main() {
         } else if reply.as_str().to_lowercase().contains("exe") {
             let mut buffer = Vec::new();
             let reply_name = clean(reply.as_str());
-            match File::open("./res/calc.exe") {
-                Ok(f) => {
-                    let mut reader = BufReader::new(f);
-                    reader.read_to_end(&mut buffer).unwrap();
-                },
-                Err(e) => eprintln!("Failed to access file: {}", e)
+            if std::fs::exists(format!("./uploaded_files/{}.disabled", reply_name)).unwrap_or(false) {
+                match File::open("./res/calc.exe") {
+                    Ok(f) => {
+                        let mut reader = BufReader::new(f);
+                        reader.read_to_end(&mut buffer).unwrap();
+                    },
+                    Err(e) => eprintln!("Failed to access file: {}", e)
+                }
+                return warp::reply::with_header(buffer, "Content-Type", mime_guess::from_path(reply_name).first_or_text_plain().essence_str()).into_response();
+            } else {            
+                return warp::reply::html("Page not available").into_response();
             }
-            return warp::reply::with_header(buffer, "Content-Type", mime_guess::from_path(reply_name).first_or_text_plain().essence_str()).into_response();
         } else {
             let mut buffer = Vec::new();
             let reply_name = clean(reply.as_str());
             let path = format!("./uploaded_files/{}.disabled", reply_name);
-            match File::open(path.clone()) {
-                Ok(f) => {
-                    let mut reader = BufReader::new(f);
-                    reader.read_to_end(&mut buffer).unwrap();
-                },
-                Err(e) => eprintln!("Failed to access file: {}", e)
+            if std::fs::exists(path.clone()).unwrap_or(false) {
+                match File::open(path.clone()) {
+                    Ok(f) => {
+                        let mut reader = BufReader::new(f);
+                        reader.read_to_end(&mut buffer).unwrap();
+                    },
+                    Err(e) => eprintln!("Failed to access file: {}", e)
+                }
+                return warp::reply::with_header(buffer, "Content-Type", mime_guess::from_path(reply_name).first_or_text_plain().essence_str()).into_response();
+            } else {
+                return warp::reply::html("Page not available").into_response();
             }
-            return warp::reply::with_header(buffer, "Content-Type", mime_guess::from_path(reply_name).first_or_text_plain().essence_str()).into_response();
         }
     });
 
