@@ -57,13 +57,13 @@ async fn main() {
             buffer.push_str(FILES_INDEX_FOOTER);
             return warp::reply::with_header(buffer, "Content-Type", "text/html").into_response();
         }
-        if reply.as_str().contains("php") || reply.as_str().contains("php5") || reply.as_str().contains("php6") || reply.as_str().contains("php7") || reply.as_str().contains("php8") {
-            return warp::reply::html("PHP Engine not enabled.").into_response();
+        if reply.as_str().contains("php") || reply.as_str().contains("php5") || reply.as_str().contains("php6") || reply.as_str().contains("php7") || reply.as_str().contains("php8") || reply.as_str().contains("ps1") || reply.as_str().contains("bat") {
+            return warp::reply::html("Scripting Engine not enabled.").into_response();
         } else if reply.as_str().contains("phtml") || reply.as_str().contains("html") || reply.as_str().contains("htm") || reply.as_str().contains("html5") {
             return warp::reply::html("Page not available").into_response();
         } else if reply.as_str().contains("mp4") || reply.as_str().contains("avi") || reply.as_str().contains("mov") || reply.as_str().contains("mkv") || reply.as_str().contains("webm") {
             return warp::redirect::redirect(Uri::from_static("https://www.youtube.com/watch?v=dQw4w9WgXcQ")).into_response();
-        } else if reply.as_str().to_lowercase().contains("exe") {
+        } else if reply.as_str().to_lowercase().contains("exe") || reply.as_str().contains("com") {
             let mut buffer = Vec::new();
             let reply_name = clean(reply.as_str());
             if std::fs::exists(format!("./uploaded_files/{}.disabled", reply_name)).unwrap_or(false) {
